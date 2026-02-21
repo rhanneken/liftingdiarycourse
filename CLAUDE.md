@@ -15,6 +15,12 @@ A Next.js 16 application (App Router) built with TypeScript and Tailwind CSS 4. 
 
 No test framework is configured yet.
 
+## Docs-First Rule
+
+**IMPORTANT**: Before generating any code, always read the relevant file(s) in the `/docs` directory first. These files define the conventions, patterns, and decisions for this project. Code must conform to what is documented there.
+
+- /docs/ui.md
+
 ## Architecture
 
 - **App Router**: All routes live under `src/app/` using Next.js App Router conventions
