@@ -20,6 +20,7 @@ No test framework is configured yet.
 **IMPORTANT**: Before generating any code, always read the relevant file(s) in the `/docs` directory first. These files define the conventions, patterns, and decisions for this project. Code must conform to what is documented there.
 
 - /docs/ui.md
+- /docs/data-fetching.md
 
 ## Architecture
 
