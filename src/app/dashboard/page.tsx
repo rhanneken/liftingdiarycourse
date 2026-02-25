@@ -1,10 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
+import Link from "next/link";
 import { DatePicker } from "@/components/date-picker";
 import { getWorkoutsForDate } from "@/data/workouts";
+import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -36,37 +39,64 @@ export default async function DashboardPage({
       </div>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold">
-          Workouts for {format(date, "do MMM yyyy")}
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">
+            Workouts for {format(date, "do MMM yyyy")}
+          </h2>
+          <Button asChild>
+            <Link href="/dashboard/workout/new">Log Workout</Link>
+          </Button>
+        </div>
 
         {workouts.length === 0 ? (
           <p className="text-muted-foreground">No workouts logged for this date.</p>
         ) : (
           <div className="flex flex-col gap-3">
             {workouts.map((workout) =>
-              workout.workoutExercises.map((we) => (
-                <Card key={we.id}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">{we.exercise.name}</CardTitle>
-                    <CardDescription>
-                      {we.sets.length} set{we.sets.length !== 1 ? "s" : ""}
-                    </CardDescription>
+              workout.workoutExercises.length === 0 && !workout.completedAt ? (
+                <Card key={workout.id}>
+                  <CardHeader>
+                    {workout.name && (
+                      <CardTitle className="text-base">{workout.name}</CardTitle>
+                    )}
+                    <CardDescription>In Progress</CardDescription>
+                    <CardAction>
+                      <p className="text-xs text-muted-foreground">
+                        {format(workout.startedAt, "h:mm a")}
+                      </p>
+                    </CardAction>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {we.sets.map((set) => (
-                        <span
-                          key={set.id}
-                          className="rounded-md bg-muted px-2 py-1 text-sm text-muted-foreground"
-                        >
-                          {set.weight}kg × {set.reps}
-                        </span>
-                      ))}
-                    </div>
-                  </CardContent>
                 </Card>
-              ))
+              ) : (
+                workout.workoutExercises.map((we) => (
+                  <Card key={we.id}>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">{we.exercise.name}</CardTitle>
+                      <CardDescription>
+                        {we.sets.length} set{we.sets.length !== 1 ? "s" : ""}
+                      </CardDescription>
+                      <CardAction>
+                        <p className="text-xs text-muted-foreground">
+                          {format(workout.startedAt, "h:mm a")}
+                          {workout.completedAt && ` – ${format(workout.completedAt, "h:mm a")}`}
+                        </p>
+                      </CardAction>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-wrap gap-2">
+                        {we.sets.map((set) => (
+                          <span
+                            key={set.id}
+                            className="rounded-md bg-muted px-2 py-1 text-sm text-muted-foreground"
+                          >
+                            {set.weight}kg × {set.reps}
+                          </span>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )
             )}
           </div>
         )}
