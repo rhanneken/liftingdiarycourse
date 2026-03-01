@@ -13,25 +13,38 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { createWorkoutAction } from "./actions";
+import { updateWorkoutAction } from "./actions";
 
-function getCurrentTime() {
-  const now = new Date();
-  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+interface EditWorkoutFormProps {
+  workoutId: number;
+  initialName: string | null;
+  initialStartedAt: Date;
 }
 
-export function NewWorkoutForm() {
+export function EditWorkoutForm({
+  workoutId,
+  initialName,
+  initialStartedAt,
+}: EditWorkoutFormProps) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [date, setDate] = useState<Date>(new Date());
-  const [time, setTime] = useState(getCurrentTime);
+  const [name, setName] = useState(initialName ?? "");
+  const [date, setDate] = useState<Date>(initialStartedAt);
+  const [time, setTime] = useState(() => {
+    const h = String(initialStartedAt.getHours()).padStart(2, "0");
+    const m = String(initialStartedAt.getMinutes()).padStart(2, "0");
+    return `${h}:${m}`;
+  });
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const [hours, minutes] = time.split(":").map(Number);
     const startedAt = new Date(date);
     startedAt.setHours(hours, minutes, 0, 0);
-    const result = await createWorkoutAction({ name: name || undefined, startedAt });
+    const result = await updateWorkoutAction({
+      workoutId,
+      name: name || undefined,
+      startedAt,
+    });
     if (!result?.error) {
       router.push("/dashboard");
     }
@@ -80,7 +93,7 @@ export function NewWorkoutForm() {
       </div>
 
       <Button type="submit" className="w-fit">
-        Create Workout
+        Save Changes
       </Button>
     </form>
   );

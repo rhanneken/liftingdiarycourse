@@ -23,6 +23,8 @@ No test framework is configured yet.
 - /docs/data-fetching.md
 - /docs/auth.md
 - /docs/data-mutations.md
+- /docs/server-components.md
+- /docs/routing.md
 
 ## Architecture
 
