@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { format } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
 import Link from "next/link";
 import { DatePicker } from "@/components/date-picker";
 import { getWorkoutsForDate } from "@/data/workouts";
@@ -9,10 +9,18 @@ import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+function formatDuration(startedAt: Date, completedAt: Date): string {
+  const totalMinutes = differenceInMinutes(completedAt, startedAt);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) return `${minutes} min`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes} min`;
+}
 
 export default async function DashboardPage({
   searchParams,
@@ -52,52 +60,29 @@ export default async function DashboardPage({
           <p className="text-muted-foreground">No workouts logged for this date.</p>
         ) : (
           <div className="flex flex-col gap-3">
-            {workouts.map((workout) =>
-              workout.workoutExercises.length === 0 && !workout.completedAt ? (
-                <Card key={workout.id}>
+            {workouts.map((workout) => (
+              <Link key={workout.id} href={`/dashboard/workout/${workout.id}`}>
+                <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
                   <CardHeader>
                     {workout.name && (
                       <CardTitle className="text-base">{workout.name}</CardTitle>
                     )}
-                    <CardDescription>In Progress</CardDescription>
                     <CardAction>
                       <p className="text-xs text-muted-foreground">
                         {format(workout.startedAt, "h:mm a")}
                       </p>
                     </CardAction>
                   </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      {workout.completedAt
+                        ? formatDuration(workout.startedAt, workout.completedAt)
+                        : "In Progress"}
+                    </p>
+                  </CardContent>
                 </Card>
-              ) : (
-                workout.workoutExercises.map((we) => (
-                  <Card key={we.id}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">{we.exercise.name}</CardTitle>
-                      <CardDescription>
-                        {we.sets.length} set{we.sets.length !== 1 ? "s" : ""}
-                      </CardDescription>
-                      <CardAction>
-                        <p className="text-xs text-muted-foreground">
-                          {format(workout.startedAt, "h:mm a")}
-                          {workout.completedAt && ` – ${format(workout.completedAt, "h:mm a")}`}
-                        </p>
-                      </CardAction>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap gap-2">
-                        {we.sets.map((set) => (
-                          <span
-                            key={set.id}
-                            className="rounded-md bg-muted px-2 py-1 text-sm text-muted-foreground"
-                          >
-                            {set.weight}kg × {set.reps}
-                          </span>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )
-            )}
+              </Link>
+            ))}
           </div>
         )}
       </section>
