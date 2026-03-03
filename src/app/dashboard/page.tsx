@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -35,7 +34,7 @@ export default async function DashboardPage({
       <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
 
       <div className="mb-8">
-        <DatePicker date={date} />
+        <DatePicker dateStr={dateStr} />
       </div>
 
       <section>
@@ -52,52 +51,36 @@ export default async function DashboardPage({
           <p className="text-muted-foreground">No workouts logged for this date.</p>
         ) : (
           <div className="flex flex-col gap-3">
-            {workouts.map((workout) =>
-              workout.workoutExercises.length === 0 && !workout.completedAt ? (
-                <Card key={workout.id}>
-                  <CardHeader>
-                    {workout.name && (
-                      <CardTitle className="text-base">{workout.name}</CardTitle>
-                    )}
-                    <CardDescription>In Progress</CardDescription>
-                    <CardAction>
-                      <p className="text-xs text-muted-foreground">
-                        {format(workout.startedAt, "h:mm a")}
-                      </p>
-                    </CardAction>
-                  </CardHeader>
-                </Card>
-              ) : (
-                workout.workoutExercises.map((we) => (
-                  <Card key={we.id}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">{we.exercise.name}</CardTitle>
-                      <CardDescription>
-                        {we.sets.length} set{we.sets.length !== 1 ? "s" : ""}
-                      </CardDescription>
+            {workouts.map((workout) => {
+              const durationLabel = (() => {
+                if (!workout.completedAt) return "In Progress";
+                const mins = Math.round(
+                  (workout.completedAt.getTime() - workout.startedAt.getTime()) / 60000
+                );
+                const h = Math.floor(mins / 60);
+                const m = mins % 60;
+                if (h > 0 && m > 0) return `${h}h ${m} min`;
+                if (h > 0) return `${h}h`;
+                return `${m} min`;
+              })();
+              return (
+                <Link key={workout.id} href={`/dashboard/workout/${workout.id}`}>
+                  <Card className="cursor-pointer transition-colors hover:bg-accent/50">
+                    <CardHeader>
+                      {workout.name && (
+                        <CardTitle className="text-base">{workout.name}</CardTitle>
+                      )}
+                      <CardDescription>{durationLabel}</CardDescription>
                       <CardAction>
                         <p className="text-xs text-muted-foreground">
                           {format(workout.startedAt, "h:mm a")}
-                          {workout.completedAt && ` – ${format(workout.completedAt, "h:mm a")}`}
                         </p>
                       </CardAction>
                     </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap gap-2">
-                        {we.sets.map((set) => (
-                          <span
-                            key={set.id}
-                            className="rounded-md bg-muted px-2 py-1 text-sm text-muted-foreground"
-                          >
-                            {set.weight}kg × {set.reps}
-                          </span>
-                        ))}
-                      </div>
-                    </CardContent>
                   </Card>
-                ))
-              )
-            )}
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

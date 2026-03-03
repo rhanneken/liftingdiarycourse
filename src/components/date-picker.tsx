@@ -12,11 +12,13 @@ import {
 } from "@/components/ui/popover";
 
 interface DatePickerProps {
-  date: Date;
+  dateStr: string;
 }
 
-export function DatePicker({ date }: DatePickerProps) {
+export function DatePicker({ dateStr }: DatePickerProps) {
   const router = useRouter();
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
 
   function handleSelect(day: Date | undefined) {
     if (!day) return;
