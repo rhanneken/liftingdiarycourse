@@ -12,15 +12,17 @@ import {
 } from "@/components/ui/popover";
 
 interface DatePickerProps {
-  date: Date;
+  dateStr: string;
 }
 
-export function DatePicker({ date }: DatePickerProps) {
+export function DatePicker({ dateStr }: DatePickerProps) {
   const router = useRouter();
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day); // parse in local timezone
 
-  function handleSelect(day: Date | undefined) {
-    if (!day) return;
-    router.push(`?date=${format(day, "yyyy-MM-dd")}`);
+  function handleSelect(selected: Date | undefined) {
+    if (!selected) return;
+    router.push(`?date=${format(selected, "yyyy-MM-dd")}`);
   }
 
   return (

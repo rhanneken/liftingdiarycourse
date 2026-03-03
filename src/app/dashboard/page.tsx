@@ -35,7 +35,7 @@ export default async function DashboardPage({
       <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
 
       <div className="mb-8">
-        <DatePicker date={date} />
+        <DatePicker dateStr={dateStr} />
       </div>
 
       <section>

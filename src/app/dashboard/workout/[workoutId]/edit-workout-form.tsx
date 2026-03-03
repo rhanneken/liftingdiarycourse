@@ -35,6 +35,8 @@ export function EditWorkoutForm({
     return `${h}:${m}`;
   });
 
+  const cancelDateStr = format(initialStartedAt, "yyyy-MM-dd");
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const [hours, minutes] = time.split(":").map(Number);
@@ -46,7 +48,7 @@ export function EditWorkoutForm({
       startedAt,
     });
     if (!result?.error) {
-      router.push("/dashboard");
+      router.push(`/dashboard?date=${format(startedAt, "yyyy-MM-dd")}`);
     }
   }
 
@@ -92,9 +94,18 @@ export function EditWorkoutForm({
         </div>
       </div>
 
-      <Button type="submit" className="w-fit">
-        Save Changes
-      </Button>
+      <div className="flex gap-3">
+        <Button type="submit" className="w-fit">
+          Save Changes
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push(`/dashboard?date=${cancelDateStr}`)}
+        >
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 }
