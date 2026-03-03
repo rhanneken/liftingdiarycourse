@@ -25,6 +25,7 @@ export default async function EditWorkoutPage({
         workoutId={workout.id}
         initialName={workout.name ?? null}
         initialStartedAt={workout.startedAt}
+        initialDateStr={workout.startedAt.toISOString().slice(0, 10)}
       />
     </main>
   );

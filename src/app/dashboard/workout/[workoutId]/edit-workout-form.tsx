@@ -19,12 +19,14 @@ interface EditWorkoutFormProps {
   workoutId: number;
   initialName: string | null;
   initialStartedAt: Date;
+  initialDateStr: string;
 }
 
 export function EditWorkoutForm({
   workoutId,
   initialName,
   initialStartedAt,
+  initialDateStr,
 }: EditWorkoutFormProps) {
   const router = useRouter();
   const [name, setName] = useState(initialName ?? "");
@@ -46,7 +48,8 @@ export function EditWorkoutForm({
       startedAt,
     });
     if (!result?.error) {
-      router.push("/dashboard");
+      const newDateStr = format(startedAt, "yyyy-MM-dd");
+      router.push(`/dashboard?date=${newDateStr}`);
     }
   }
 
@@ -92,9 +95,16 @@ export function EditWorkoutForm({
         </div>
       </div>
 
-      <Button type="submit" className="w-fit">
-        Save Changes
-      </Button>
+      <div className="flex gap-3">
+        <Button type="submit">Save Changes</Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push(`/dashboard?date=${initialDateStr}`)}
+        >
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 }
