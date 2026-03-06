@@ -20,11 +20,23 @@ function getCurrentTime() {
   return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
-export function NewWorkoutForm() {
+function parseDateStr(dateStr: string | undefined): Date {
+  if (dateStr) {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date();
+}
+
+export function NewWorkoutForm({ initialDateStr }: { initialDateStr?: string }) {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(() => parseDateStr(initialDateStr));
   const [time, setTime] = useState(getCurrentTime);
+
+  function getDateStr(d: Date) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,8 +45,12 @@ export function NewWorkoutForm() {
     startedAt.setHours(hours, minutes, 0, 0);
     const result = await createWorkoutAction({ name: name || undefined, startedAt });
     if (!result?.error) {
-      router.push("/dashboard");
+      router.push(`/dashboard?date=${getDateStr(date)}`);
     }
+  }
+
+  function handleCancel() {
+    router.push(`/dashboard?date=${getDateStr(date)}`);
   }
 
   return (
@@ -79,9 +95,14 @@ export function NewWorkoutForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-fit">
-        Create Workout
-      </Button>
+      <div className="flex gap-2">
+        <Button type="submit" className="w-fit">
+          Create Workout
+        </Button>
+        <Button type="button" variant="outline" onClick={handleCancel}>
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 }

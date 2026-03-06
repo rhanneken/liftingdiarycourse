@@ -43,7 +43,7 @@ export default async function DashboardPage({
             Workouts for {format(date, "do MMM yyyy")}
           </h2>
           <Button asChild>
-            <Link href="/dashboard/workout/new">Log Workout</Link>
+            <Link href={`/dashboard/workout/new?date=${dateStr}`}>Log Workout</Link>
           </Button>
         </div>
 
